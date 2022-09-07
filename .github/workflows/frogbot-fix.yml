@@ -1,0 +1,67 @@
+name: "Frogbot Scan and Fix"
+on:
+  push:
+    # Creating fix pull requests will be triggered by any push to one of the these branches.
+    # You can add or replace to any branch you want to open fix pull requests for.
+    branches:
+      - "main"
+      - "master"
+permissions:
+  contents: write
+  pull-requests: write
+  security-events: write
+jobs:
+  create-fix-pull-requests:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      # Install prerequisites
+      - name: Setup NodeJS
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16.x"
+
+      - uses: jfrog/frogbot@v2
+        env:
+          # [Mandatory]
+          # The command that installs the dependencies
+          JF_INSTALL_DEPS_CMD: "npm i"
+
+          # [Mandatory]
+          # JFrog platform URL (This functionality requires version 3.29.0 or above of Xray)
+          JF_URL: "https://scybers123.jfrog.io"
+
+          # [Mandatory if JF_ACCESS_TOKEN is not provided]
+          # JFrog username with 'read' permissions for Xray. Must be provided with JF_PASSWORD
+          # JF_USER: ${{ secrets.JF_USER }}
+
+          # [Mandatory if JF_ACCESS_TOKEN is not provided]
+          # JFrog password. Must be provided with JF_USER
+          # JF_PASSWORD: ${{ secrets.JF_PASSWORD }}
+
+          # [Mandatory]
+          # The GitHub token automatically generated for the job
+          JF_GIT_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+          # Uncomment the below options if you'd like to use them.
+
+          # [Optional, default: https://api.github.com]
+          # API endpoint to GitHub
+          # JF_GIT_API_ENDPOINT: https://github.example.com
+
+          # [Mandatory if JF_USER and JF_PASSWORD are not provided]
+          # JFrog access token with 'read' permissions on Xray service
+          JF_ACCESS_TOKEN: "eyJ2ZXIiOiIyIiwidHlwIjoiSldUIiwiYWxnIjoiUlMyNTYiLCJraWQiOiJITi1MUlpwZnYxd1N3UkhHSHVVY0RHekpoeEM1NHlvUGw5TVE0MW95S3M0In0.eyJleHQiOiJ7XCJyZXZvY2FibGVcIjpcInRydWVcIn0iLCJzdWIiOiJqZmFjQDAxZ2M4Z3A1MzlodGh4MXBwNGV3YmMwZWJmXC91c2Vyc1wvdGhhcnVzaGFyYXNoaW5pOTgxOUBnbWFpbC5jb20iLCJzY3AiOiJhcHBsaWVkLXBlcm1pc3Npb25zXC9hZG1pbiIsImF1ZCI6IipAKiIsImlzcyI6ImpmZmVAMDAwIiwiaWF0IjoxNjYyNTM0NTQyLCJqdGkiOiIwOTM4NTk3NS0zNWQ2LTQ2NTktYTlmNS1iMzQxZDAwNTMzMTIifQ.YEMWhX02nggxraCZg_Mni3BK06dlvBGmgLtclK2rldRuXI3aTRafdrJ_OsC99uFZYtT8sRvp42-PZ0dv3zjdzNiO1Jpk7us2CoXVGbl9g2CbV4DjU6PITUpa1k9lpNd5HuK3Rm-HLVcnt_4Ntrl86wfM1KkVM05JvRXpVLWXRHth2dhhEGX0uayUz7yhwOp7RYuPnXgLJNj6He982jKo40uFdoEZO6BPzaqwoeKouxYzRMSVLU2-nFDpjF-QtjBG1wVAKYU-LyeVaKmiuMPBlkRs4tsMhIDZ7C1F0K_FjHiBhUsC632BBqavtSjJ2e5mC_8Afw1DmKFTp1k32bFiTw"
+
+          # [Optional, default: "."]
+          # Relative path to the project in the git repository
+          # JF_WORKING_DIR: path/to/package.json/dir
+
+          # [Optional]
+          # Xray Watches. Learn more about them here: https://www.jfrog.com/confluence/display/JFROG/Configuring+Xray+Watches
+          # JF_WATCHES: <watch-1>,<watch-2>...<watch-n>
+
+          # [Optional]
+          # JFrog project. Learn more about it here: https://www.jfrog.com/confluence/display/JFROG/Projects
+          # JF_PROJECT: <project-key>
